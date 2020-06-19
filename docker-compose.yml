@@ -21,8 +21,17 @@ services:
       - ossec_active_response:/var/ossec/active-response/bin
       - ossec_agentless:/var/ossec/agentless
       - ossec_wodles:/var/ossec/wodles
-      - filebeat_etc:/etc/filebeat
-      - filebeat_var:/var/lib/filebeat
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.7.1
+    hostname: filebeat
+    restart: always
+    #command: filebeat -e -strict.perms=false
+    volumes:
+      - ./filebeat_conf/filebeat.yml:/etc/filebeat/filebeat.yml
+      - ./filebeat_conf/wazuh-template.json:/etc/filebeat/wazuh-template.json
+      - ./filebeat_conf/wazuh/:/usr/share/filebeat/module/wazuh/
+      - ossec_logs:/var/ossec/logs
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.1
@@ -75,5 +84,3 @@ volumes:
   ossec_active_response:
   ossec_agentless:
   ossec_wodles:
-  filebeat_etc:
-  filebeat_var:
