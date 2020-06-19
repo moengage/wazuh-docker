@@ -1,10 +1,7 @@
 # Wazuh Docker Copyright (C) 2020 Wazuh Inc. (License GPLv2)
 FROM centos:7
 
-ARG FILEBEAT_VERSION=7.7.1
 ARG WAZUH_VERSION=3.12.3-1
-ARG TEMPLATE_VERSION="v3.12.3"
-ARG WAZUH_FILEBEAT_MODULE="wazuh-filebeat-0.1.tar.gz"
 
 ENV API_USER="foo" \
    API_PASS="bar"
@@ -22,27 +19,12 @@ RUN yum --enablerepo=updates clean metadata && \
   sed -i "s/^enabled=1/enabled=0/" /etc/yum.repos.d/wazuh.repo && \
   yum clean all && rm -rf /var/cache/yum
 
-RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILEBEAT_VERSION}-x86_64.rpm &&\
-  rpm -i filebeat-${FILEBEAT_VERSION}-x86_64.rpm && rm -f filebeat-${FILEBEAT_VERSION}-x86_64.rpm
-
-RUN curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/${TEMPLATE_VERSION}/extensions/elasticsearch/7.x/wazuh-template.json &&\
-  chmod go+r /etc/filebeat/wazuh-template.json
-
-RUN curl -s https://packages.wazuh.com/3.x/filebeat/${WAZUH_FILEBEAT_MODULE} | tar -xvz -C /usr/share/filebeat/module
-
 ARG S6_VERSION="v2.0.0.1"
 RUN curl --fail --silent -L https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-amd64.tar.gz \
     -o /tmp/s6-overlay-amd64.tar.gz && \
     tar xzf /tmp/s6-overlay-amd64.tar.gz -C / --exclude="./bin" && \
     tar xzf /tmp/s6-overlay-amd64.tar.gz -C /usr ./bin && \
     rm  /tmp/s6-overlay-amd64.tar.gz
-
-COPY config/filebeat.yml /etc/filebeat/
-
-RUN chmod go-w /etc/filebeat/filebeat.yml
-
-ADD https://raw.githubusercontent.com/wazuh/wazuh/$TEMPLATE_VERSION/extensions/elasticsearch/7.x/wazuh-template.json /etc/filebeat
-RUN chmod go-w /etc/filebeat/wazuh-template.json
 
 COPY config/etc/ /etc/
 
