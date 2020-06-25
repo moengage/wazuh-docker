@@ -1,7 +1,7 @@
 # Wazuh Docker Copyright (C) 2020 Wazuh Inc. (License GPLv2)
 FROM centos:7
 
-ARG WAZUH_VERSION=3.12.3-1
+ARG WAZUH_VERSION=3.13.0-1
 
 ENV API_USER="foo" \
    API_PASS="bar"
