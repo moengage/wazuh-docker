@@ -1,0 +1,10 @@
+pipeline:
+  worker-build:
+    group: build
+    image: plugins/ecr
+    repo: 612427630422.dkr.ecr.us-east-1.amazonaws.com/sre/wazuh
+    context: ./wazuh-odfe
+    dockerfile: ./wazuh-odfe/Dockerfile
+    tags:
+      - ${DRONE_COMMIT_SHA:0:8}
+      - ${DRONE_COMMIT_BRANCH}
